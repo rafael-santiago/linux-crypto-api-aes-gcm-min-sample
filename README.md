@@ -8,7 +8,7 @@ I have waste some time on it and I hope you waste less of your time from now on.
 
 >>"A good idea is an orphan without effective communication" -- Andrew Hunt, The Pragmatic Programmer.
 
-You have found issues? Please, let me [know](https://github.com/rafael-santiago/linux-crypto-api-aes-gcm-min-sample) and
+You have found issues? Please, let me [know](https://github.com/rafael-santiago/linux-crypto-api-aes-gcm-min-sample/issues) and
 thank you!
 
 ## How can I clone it?
