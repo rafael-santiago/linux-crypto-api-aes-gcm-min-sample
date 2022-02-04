@@ -59,11 +59,11 @@ static inline int crypto_wait_req(int err, struct crypto_wait *wait) {
 #endif
 
 MODULE_AUTHOR("Rafael Santiago");
-MODULE_DESCRIPTION("aes-gcm-min-sample is an attempt of produce a sane and well-explained "
+MODULE_DESCRIPTION("aes-gcm-min-sample is an attempt of producing a sane and well-explained "
                    "tiny code to show how to use (minimally) AES-256/GCM into with Linux "
-                   "kernel crypto api. Instead of wasting hours grasping into code that "
+                   "kernel crypto API. Instead of wasting hours grasping into code that "
                    "does not matter directly for your task. "
-                   "Issues <https://github.com/rafael-santiago/linux-crypto-api-aes-gcm-min-sample>, thank you!");
+                   "Issues <https://github.com/rafael-santiago/linux-crypto-api-aes-gcm-min-sample/issues>, thank you!");
 MODULE_LICENSE("GPL");
 
 #define TEST_DATA "This is a test!!"
@@ -124,9 +124,8 @@ int do_aes_gcm_min_sample(void) {
     req->assoclen = 0; // INFO(Rafael): No associated data, just reinforcing it.
                        //               Anyway, when you want to also authenticated
                        //               plain data (a.k.a AAD, associated data) you
-                       //               must to indicate the size in bytes of the
-                       //               aad here and prepend your plaintext with
-                       //               aad.
+                       //               must indicate the size in bytes of the aad
+                       //               here and prepend your plaintext with aad.
 
     get_random_bytes(iv, sizeof(iv));
 
@@ -157,7 +156,7 @@ int do_aes_gcm_min_sample(void) {
     // INFO(Rafael): ...however our scattterlist must be initialised
     //               by indicating the whole allocated buffer segment (including room
     //               for the tag). Because it will also output data, got it?
-    sg_init_one(&sg, buffer, buffer_size + AES_GCM_TAG_SIZE);
+    sg_init_one(&sg, buffer, buffer_size);
     aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
                                    CRYPTO_TFM_REQ_MAY_SLEEP, crypto_req_done, &wait);
 
