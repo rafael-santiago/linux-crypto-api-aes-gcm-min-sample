@@ -19,7 +19,7 @@
 // WARN(Rafael): I have tested it on 4.4.14 and this workaround seems fine
 //               on my tests. Anyway, if you are gonna to use it you should
 //               question someone more near to linux/crypto subtree about it.
-//               Maybe it could be capable of causing some unrelated unstability
+//               Maybe it can be capable of causing some unrelated unstability
 //               in the system as whole, but only who actually work with the
 //               crypto core would say.
 
@@ -37,6 +37,7 @@ void crypto_req_done(struct crypto_async_request *req, int err) {
     wait->err = err;
     complete(&wait->completion);
 }
+
 EXPORT_SYMBOL_GPL(crypto_req_done);
 
 static inline int crypto_wait_req(int err, struct crypto_wait *wait) {
@@ -56,13 +57,13 @@ static inline int crypto_wait_req(int err, struct crypto_wait *wait) {
     struct crypto_wait _wait = {\
         COMPLETION_INITIALIZER_ONSTACK((_wait).completion) }
 
-#endif
+#endif // LINUX_VERSION_CODE < KERNEL_VERSION(4,15,18)
 
 MODULE_AUTHOR("Rafael Santiago");
 MODULE_DESCRIPTION("aes-gcm-min-sample is an attempt of producing a sane and well-explained "
                    "tiny code to show how to use (minimally) AES-256/GCM into with Linux "
                    "kernel crypto API. Instead of wasting hours grasping into code that "
-                   "does not matter directly for your task. "
+                   "does not matter directly to your task. "
                    "Issues <https://github.com/rafael-santiago/linux-crypto-api-aes-gcm-min-sample/issues>, thank you!");
 MODULE_LICENSE("GPL");
 
@@ -79,7 +80,7 @@ int do_aes_gcm_min_sample(void) {
     struct scatterlist sg = { 0 };
     DECLARE_CRYPTO_WAIT(wait);
     // INFO(Rafael): The majority of AES/GCM implementation uses 12 bytes iv (crypto_aead_ivsize()
-    //               returned this, so for this reason I am using this "magic" value here.)
+    //               returns this, so for this reason I am using this "magic" value here.)
     u8 iv[12] = { 0 };
     u8 key[32] = { 0 }; // INFO(Rafael): The version of AES is defined by the size (in bytes) of the
                         //               informed key. So, here we are using AES-256.
@@ -93,7 +94,7 @@ int do_aes_gcm_min_sample(void) {
         goto do_aes_gcm_min_sample_epilogue;
     }
 
-    // INFO(Rafael): Telling to api how many bytes will compound our MAC (a.k.a tag etc [etc no!...]).
+    // INFO(Rafael): Telling to API how many bytes will compound our MAC (a.k.a tag etc [etc no!...]).
     err = crypto_aead_setauthsize(tfm, AES_GCM_TAG_SIZE);
     if (err != 0) {
         pr_err("AES/GCM min sample: crypto_aead_setauthsize() has failed: %d.\n", err);
@@ -146,7 +147,7 @@ int do_aes_gcm_min_sample(void) {
     bp = buffer;
     bp_end = bp + TEST_DATA_SIZE;
 
-    // INFO(Rafael): Currently buffer contains only the one dummy test block. Right?...
+    // INFO(Rafael): Currently buffer contains only one dummy test block. Right?...
     pr_info("Original data: ");
     while (bp != bp_end) {
         pr_info("%c\n", isprint(*bp) ? *bp : '.');
@@ -172,11 +173,12 @@ int do_aes_gcm_min_sample(void) {
     }
 
     // INFO(Rafael): If aad would be also passed it would prepend the cryptogram.
-    //               req-assoclen give you the clue of traverse or even skip it.
+    //               req-assoclen give you the clue of how much traversing or even how much bytes
+    //               ahead must be skipped.
 
     pr_info("Cryptogram: ");
     // INFO(Rafael): Now buffer contains the authenticated cryptogram. I meant <cryptogram><MAC>.
-    //               Here the intention is only print the cryptogram.
+    //               Here the intention is only printing the cryptogram.
     bp = buffer;
     bp_end = bp + buffer_size - AES_GCM_TAG_SIZE;
     while (bp != bp_end) {
@@ -194,9 +196,9 @@ int do_aes_gcm_min_sample(void) {
     }
 
     // INFO(Rafael): I hate incomplete samples, so let's decrypt, too.
-    //               Decrypting with GCM involves checking if the tag informed at the end of cryptogram,
+    //               Decrypting with GCM involves check whether the tag informed at the end of cryptogram
     //               is really the same of the on-the-fly calculated by GHASH. Thus, when decrypting the
-    //               is necesary to indicate the cryptogram and ***also*** the tag, so here its size is
+    //               is necessary to indicate the cryptogram and ***also*** the tag, so here its size is
     //               expressed by buffer_size.
     aead_request_set_crypt(req, &sg, &sg, buffer_size, iv);
 
@@ -205,7 +207,7 @@ int do_aes_gcm_min_sample(void) {
     //               Give it a try by uncomment all or even one of the following three lines.
     //key[sizeof(key) >> 1] += 1;
     //buffer[buffer_size >> 1] += 1;
-    //buffer[buffer_size - AES_GCM_TAG_SIZE + 1] += 1; // INFO(Rafael): Bit flipping MAC.
+    //buffer[buffer_size - AES_GCM_TAG_SIZE + 1] += 1; // INFO(Rafael): MAC bit flipping.
 
     // INFO(Rafael): For the context of this sample, it would not be necessary. Anyway, we want to test
     //               corrupted key cases.
