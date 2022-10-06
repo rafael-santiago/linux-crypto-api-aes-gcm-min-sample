@@ -1,7 +1,7 @@
 # AES/GCM min sample
 
 This is an attempt of producing a sane and well-explained tiny code to show how to use (minimally)
-``AES-256/GCM`` into with ``Linux kernel crypto api``. Instead of wasting hours grasping into code that
+``AES-256/GCM`` into ``Linux kernel crypto api``. Instead of wasting hours grasping into code that
 does not matter directly to your task.
 
 I have waste some time on it and I hope you waste less of your time from now on.
